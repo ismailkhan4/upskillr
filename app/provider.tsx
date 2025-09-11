@@ -15,11 +15,15 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const CreateNewUser = async () => {
     console.log("Creating new user");
 
-    const result = await axios.post("/api/user", {
-      name: user?.fullName,
-      email: user?.primaryEmailAddress?.emailAddress,
-    });
-    console.log("result.data", result);
+    try {
+      const result = await axios.post("/api/user", {
+        name: user?.fullName,
+        email: user?.primaryEmailAddress?.emailAddress,
+      });
+      console.log("result.data", result);
+    } catch (error) {
+      console.error("Error creating new user:", error);
+    }
   };
-  return <div className="bg-black h-screen text-white">{children}</div>;
+  return <div>{children}</div>;
 }

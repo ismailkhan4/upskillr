@@ -10,9 +10,9 @@ export default function WorkspaceProvider({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <div className="bg-black h-screen text-white w-full">
+      <div className="w-full">
         <AppHeader />
-        {children}
+        <div className="p-10">{children}</div>
       </div>
     </SidebarProvider>
   );
