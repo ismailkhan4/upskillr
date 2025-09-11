@@ -10,7 +10,10 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   console.log("user", user);
 
   useEffect(() => {
-    user && CreateNewUser();
+    if (user) {
+      CreateNewUser();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   const CreateNewUser = async () => {
     console.log("Creating new user");

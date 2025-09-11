@@ -5,7 +5,7 @@ import { useState } from "react";
 import AddNewCourseDialog from "./AddNewCourseDialog";
 
 export default function CourseList() {
-  const [courseList, setCourseList] = useState([]);
+  const [courseList] = useState([]);
   return (
     <div className="mt-10">
       <h2 className="font-bold text-3xl">Course List</h2>
@@ -18,7 +18,7 @@ export default function CourseList() {
             height={80}
           />
           <h2 className="my-2 text-xl font-bold">
-            Look like you haven't created any courses yet
+            Look like you haven&apos;t created any courses yet
           </h2>
           <AddNewCourseDialog>
             <Button>+ Create your first course</Button>

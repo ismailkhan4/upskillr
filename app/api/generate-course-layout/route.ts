@@ -73,5 +73,7 @@ export async function POST(request: Request) {
     cid: courseId,
   });
 
+  console.log("result", result);
+
   return NextResponse.json({ courseId });
 }
