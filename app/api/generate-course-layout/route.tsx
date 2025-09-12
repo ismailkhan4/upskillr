@@ -1,7 +1,9 @@
 import { db } from "@/config/db";
 import { coursesTable } from "@/config/schema";
+import { retryApiOperation, retryDbOperation } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
+import axios from "axios";
 import { NextResponse } from "next/server";
 
 const PROMPT = `Genrate Learning Course depends on following details. In which Make sure to add Course Name, Description,Course Banner Image Prompt (Create a modern, flat-style 2D digital illustration representing user Topic. Include UI/UX elements such as mockup screens, text blocks, icons, buttons, and creative workspace tools. Add symbolic elements related to user Course, like sticky notes, design components, and visual aids. Use a vibrant color palette (blues, purples, oranges) with a clean, professional look. The illustration should feel creative, tech-savvy, and educational, ideal for visualizing concepts in user Course) for Course Banner in 3d format Chapter Name, , Topic under each chapters , Duration for each chapters etc, in JSON format only
@@ -33,7 +35,7 @@ Schema:
 
 , User Input: `;
 export async function POST(request: Request) {
-  const { courseId, ...formData } = await request.json();
+  const formData = await request.json();
   const user = await currentUser();
 
   console.log("key", process.env.GEMINI_API_KEY);
@@ -57,23 +59,54 @@ export async function POST(request: Request) {
     },
   ];
 
-  const response = await ai.models.generateContent({
-    model,
-    config,
-    contents,
+  const response = await retryApiOperation(async () => {
+    return await ai.models.generateContent({
+      model,
+      config,
+      contents,
+    });
   });
   const rawResponse = response.candidates?.[0]?.content?.parts?.[0]?.text;
   const rawJson = rawResponse?.replace("```json", "").replace("```", "");
   const responseJson = JSON.parse(rawJson || "{}");
 
+  const ImagePrompt = responseJson?.course?.bannerImagePrompt;
+
+  const bannerImageUrl = await retryApiOperation(async () => {
+    return await GenerateImage(ImagePrompt);
+  });
+
   const result = await db.insert(coursesTable).values({
     ...formData,
     courseJson: responseJson,
     userEmail: user?.primaryEmailAddress?.emailAddress,
-    cid: courseId,
+    cid: "adsfasdfasdf-asdfasdfa-asdfasdfas",
+    bannerImageUrl,
   });
 
   console.log("result", result);
 
-  return NextResponse.json({ courseId });
+  return NextResponse.json({ courseId: "adsfasdfasdf-asdfasdfa-asdfasdfas" });
 }
+
+const GenerateImage = async (imagePrompt: string) => {
+  const BASE_URL = "https://aigurulab.tech";
+  const result = await axios.post(
+    BASE_URL + "/api/generate-image",
+    {
+      width: 1024,
+      height: 1024,
+      input: imagePrompt,
+      model: "sdxl",
+      aspectRatio: "16:9",
+    },
+    {
+      headers: {
+        "x-api-key": process.env.AI_IMAGE_API_KEY,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  console.log(result.data.image);
+  return result.data.image;
+};

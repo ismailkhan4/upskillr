@@ -47,14 +47,14 @@ export default function AddNewCourseDialog({
     console.log(formData);
   };
 
-  const courseId = uuid4();
+  // const courseId = uuid4();
 
   const onGenerate = async () => {
     setIsLoading(true);
     try {
       const result = await axios.post("/api/generate-course-layout", {
         ...formData,
-        courseId,
+        // courseId,
       });
       setIsLoading(false);
       route.push(`/workspace/edit-course/${result?.data?.courseId}`);
