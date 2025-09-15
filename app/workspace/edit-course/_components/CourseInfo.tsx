@@ -1,10 +1,26 @@
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 import { Book, Clock, TrendingUp } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function CourseInfo({ course }: any) {
+  const [isLoading, setIsLoading] = useState(false);
   const courseLayout = course?.courseJson?.course;
-  console.log("imageUrl", course?.bannerImageUrl);
+
+  const generateCourseContent = async () => {
+    setIsLoading(true);
+    try {
+      const result = await axios.post("/api/generate-course-content", {
+        courseJson: courseLayout,
+        courseTitle: course?.courseName,
+        courseId: course?.cid,
+      });
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="md:flex flex gap-5 justify-between p-5 rounded-2xl shadow">
@@ -36,7 +52,13 @@ export default function CourseInfo({ course }: any) {
             </section>
           </div>
         </div>
-        <Button className="max-w-sm">Generate Content</Button>
+        <Button
+          className="max-w-sm"
+          onClick={generateCourseContent}
+          disabled={isLoading}
+        >
+          Generate Content
+        </Button>
       </div>
       <Image
         src={course?.bannerImageUrl}

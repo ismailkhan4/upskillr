@@ -9,7 +9,6 @@ export default function EditCourse() {
   const { courseId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [course, setCourse] = useState();
-  console.log("courseId", courseId);
 
   useEffect(() => {
     GetCourseInfo();

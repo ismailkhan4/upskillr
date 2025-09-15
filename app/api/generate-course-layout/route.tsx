@@ -1,6 +1,5 @@
 import { db } from "@/config/db";
 import { coursesTable } from "@/config/schema";
-import { retryApiOperation, retryDbOperation } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import axios from "axios";
@@ -34,15 +33,12 @@ Schema:
 }
 
 , User Input: `;
+export const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY as string,
+});
 export async function POST(request: Request) {
-  const formData = await request.json();
+  const { courseId, ...formData } = await request.json();
   const user = await currentUser();
-
-  console.log("key", process.env.GEMINI_API_KEY);
-
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY as string,
-  });
 
   const config = {
     responseMimeType: "text/plain",
@@ -59,12 +55,10 @@ export async function POST(request: Request) {
     },
   ];
 
-  const response = await retryApiOperation(async () => {
-    return await ai.models.generateContent({
-      model,
-      config,
-      contents,
-    });
+  const response = await ai.models.generateContent({
+    model,
+    config,
+    contents,
   });
   const rawResponse = response.candidates?.[0]?.content?.parts?.[0]?.text;
   const rawJson = rawResponse?.replace("```json", "").replace("```", "");
@@ -72,21 +66,17 @@ export async function POST(request: Request) {
 
   const ImagePrompt = responseJson?.course?.bannerImagePrompt;
 
-  const bannerImageUrl = await retryApiOperation(async () => {
-    return await GenerateImage(ImagePrompt);
-  });
+  const bannerImageUrl = await GenerateImage(ImagePrompt);
 
   const result = await db.insert(coursesTable).values({
     ...formData,
     courseJson: responseJson,
     userEmail: user?.primaryEmailAddress?.emailAddress,
-    cid: "adsfasdfasdf-asdfasdfa-asdfasdfas",
+    cid: courseId,
     bannerImageUrl,
   });
 
-  console.log("result", result);
-
-  return NextResponse.json({ courseId: "adsfasdfasdf-asdfasdfa-asdfasdfas" });
+  return NextResponse.json({ courseId });
 }
 
 const GenerateImage = async (imagePrompt: string) => {
@@ -107,6 +97,5 @@ const GenerateImage = async (imagePrompt: string) => {
       },
     }
   );
-  console.log(result.data.image);
   return result.data.image;
 };

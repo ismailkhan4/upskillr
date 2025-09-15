@@ -37,6 +37,7 @@ export default function AddNewCourseDialog({
     category: "",
     level: "",
   });
+  const courseId = uuid4();
   const route = useRouter();
 
   const onHandleInputChange = (field: string, value: string | boolean) => {
@@ -44,21 +45,17 @@ export default function AddNewCourseDialog({
       ...prev,
       [field]: value,
     }));
-    console.log(formData);
   };
-
-  // const courseId = uuid4();
 
   const onGenerate = async () => {
     setIsLoading(true);
     try {
       const result = await axios.post("/api/generate-course-layout", {
         ...formData,
-        // courseId,
+        courseId,
       });
       setIsLoading(false);
       route.push(`/workspace/edit-course/${result?.data?.courseId}`);
-      console.log("result:", result);
     } catch (error) {
       console.error("Error generating course layout:", error);
     } finally {

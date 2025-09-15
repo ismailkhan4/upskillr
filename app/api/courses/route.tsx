@@ -24,7 +24,6 @@ export async function GET(request: Request) {
     .select()
     .from(coursesTable)
     .where(eq(coursesTable.cid, courseId));
-  console.log("result", result);
 
   return NextResponse.json(result[0]);
 }
