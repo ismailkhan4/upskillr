@@ -1,29 +1,30 @@
 import { db } from "@/config/db";
 import { coursesTable } from "@/config/schema";
-import axios from "axios";
-import { eq } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const courseId = searchParams.get("courseId");
+  const courseId = searchParams?.get("courseId");
+  const user = await currentUser();
 
-  const GetCourseInfo = async () => {
-    const result = await axios.get(`/api/courses?courseId=${courseId}`);
-    console.log("result.data", result.data);
-  };
+  if (courseId) {
+    const result = await db
+      .select()
+      .from(coursesTable)
+      .where(eq(coursesTable.cid, courseId));
 
-  if (!courseId) {
-    return NextResponse.json(
-      { error: "Course ID is required" },
-      { status: 400 }
-    );
+    return NextResponse.json(result[0]);
+  } else {
+    const result = await db
+      .select()
+      .from(coursesTable)
+      .where(
+        eq(coursesTable?.userEmail, user?.primaryEmailAddress?.emailAddress!)
+      )
+      .orderBy(desc(coursesTable?.id));
+
+    return NextResponse.json(result);
   }
-
-  const result = await db
-    .select()
-    .from(coursesTable)
-    .where(eq(coursesTable.cid, courseId));
-
-  return NextResponse.json(result[0]);
 }
