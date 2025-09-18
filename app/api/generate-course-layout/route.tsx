@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
   const bannerImageUrl = await GenerateImage(ImagePrompt);
 
-  const result = await db.insert(coursesTable).values({
+  await db.insert(coursesTable).values({
     ...formData,
     courseJson: responseJson,
     userEmail: user?.primaryEmailAddress?.emailAddress,

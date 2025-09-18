@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AddNewCourseDialog from "./AddNewCourseDialog";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
@@ -12,15 +12,17 @@ export default function CourseList() {
 
   const { user } = useUser();
 
-  useEffect(() => {
-    user && GetCourseList();
-  }, [user]);
-
-  const GetCourseList = async () => {
+  const GetCourseList = useCallback(async () => {
     const result = await axios.get("/api/courses");
     console.log("course:", result.data);
     setCourseList(result.data);
-  };
+  }, []);
+  useEffect(() => {
+    if (user) {
+      GetCourseList();
+    } else return;
+  }, [user, GetCourseList]);
+
   return (
     <div className="mt-10">
       <h2 className="font-bold text-xl">Course List</h2>

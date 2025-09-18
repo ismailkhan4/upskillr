@@ -1,8 +1,10 @@
 import { db } from "@/config/db";
 import { coursesTable, enrollCourseTable } from "@/config/schema";
 import { currentUser } from "@clerk/nextjs/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, InferInsertModel } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
+type EnrollCourse = InferInsertModel<typeof enrollCourseTable>;
 
 export async function POST(request: Request) {
   const { courseId } = await request.json();
@@ -25,13 +27,13 @@ export async function POST(request: Request) {
     );
 
   if (enrollCourses.length === 0) {
-    const result = await db
+    const result = (await db
       .insert(enrollCourseTable)
       .values({
         cid: courseId,
         userEmail: user?.primaryEmailAddress?.emailAddress,
       })
-      .returning(enrollCourseTable as any);
+      .returning()) as EnrollCourse[];
 
     return NextResponse.json(result);
   }
@@ -41,7 +43,11 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const user = await currentUser();
   const { searchParams } = new URL(request.url);
+  const email = user?.primaryEmailAddress?.emailAddress;
   const courseId = searchParams.get("courseId");
+  if (!email) {
+    throw new Error("User email is missing!");
+  }
   if (courseId) {
     const result = await db
       .select()
@@ -49,10 +55,7 @@ export async function GET(request: Request) {
       .innerJoin(enrollCourseTable, eq(coursesTable.cid, enrollCourseTable.cid))
       .where(
         and(
-          eq(
-            enrollCourseTable.userEmail,
-            user?.primaryEmailAddress?.emailAddress!
-          ),
+          eq(enrollCourseTable.userEmail, email),
           eq(enrollCourseTable?.cid, courseId)
         )
       );
@@ -63,12 +66,7 @@ export async function GET(request: Request) {
       .select()
       .from(coursesTable)
       .innerJoin(enrollCourseTable, eq(coursesTable.cid, enrollCourseTable.cid))
-      .where(
-        eq(
-          enrollCourseTable.userEmail,
-          user?.primaryEmailAddress?.emailAddress!
-        )
-      )
+      .where(eq(enrollCourseTable.userEmail, email))
       .orderBy(desc(enrollCourseTable.id));
 
     return NextResponse.json(result);
@@ -78,6 +76,11 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   const { completedChapter, courseId } = await request.json();
   const user = await currentUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
+
+  if (!email) {
+    throw new Error("User email is missing!");
+  }
 
   const result = await db
     .update(enrollCourseTable)
@@ -87,13 +90,14 @@ export async function PUT(request: Request) {
     .where(
       and(
         eq(enrollCourseTable.cid, courseId),
-        eq(
-          enrollCourseTable.userEmail,
-          user?.primaryEmailAddress?.emailAddress!
-        )
+        eq(enrollCourseTable.userEmail, email)
       )
     )
-    .returning(enrollCourseTable as any);
+    .returning({
+      id: enrollCourseTable.id,
+      cid: enrollCourseTable.cid,
+      userEmail: enrollCourseTable.userEmail,
+    });
 
   return NextResponse.json(result);
 }

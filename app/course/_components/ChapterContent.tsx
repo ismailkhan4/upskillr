@@ -6,10 +6,19 @@ import { CheckCircle, Loader2Icon, X } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { CourseInfo, CourseTopic, CourseVideo } from "@/types/types";
 
-export default function ChapterContent({ courseInfo, refreshData }: any) {
+interface ChapterContentProps {
+  courseInfo: CourseInfo;
+  refreshData: () => void;
+}
+
+export default function ChapterContent({
+  courseInfo,
+  refreshData,
+}: ChapterContentProps) {
   const { courseId } = useParams();
-  const { course, enrollCourse } = courseInfo ?? "";
+  const { enrollCourse }: CourseInfo = courseInfo ?? "";
   const courseContent = courseInfo?.courses?.courseContent;
 
   const context = useContext(SelectedChapterIndexContext);
@@ -20,13 +29,13 @@ export default function ChapterContent({ courseInfo, refreshData }: any) {
     );
   }
 
-  const { selectedChapterIndex, setSelectedChapterIndex } = context;
+  const { selectedChapterIndex } = context;
   const videoData = courseContent?.[selectedChapterIndex]?.youtubeVideo;
   const topics = courseContent?.[selectedChapterIndex]?.courseData?.topics;
 
   const [isLoading, setIsLoading] = useState(false);
 
-  let completedChapter = enrollCourse?.completedChapter ?? [];
+  const completedChapter = enrollCourse?.completedChapters ?? [];
 
   const markChapterCompleted = async () => {
     setIsLoading(true);
@@ -44,7 +53,7 @@ export default function ChapterContent({ courseInfo, refreshData }: any) {
   const markChapterIncompleted = async () => {
     setIsLoading(true);
     const completedChap = completedChapter.filter(
-      (item: any) => item != selectedChapterIndex
+      (item: number) => item != selectedChapterIndex
     );
     const result = await axios.put("/api/enroll-course", {
       courseId: courseId,
@@ -82,7 +91,7 @@ export default function ChapterContent({ courseInfo, refreshData }: any) {
       <h2 className="my-2 font-bold text-lg">Related Videos</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {videoData?.map(
-          (video: any, index: number) =>
+          (video: CourseVideo, index: number) =>
             index < 3 && (
               <div key={index}>
                 <Youtube
@@ -97,12 +106,11 @@ export default function ChapterContent({ courseInfo, refreshData }: any) {
         )}
       </div>
       <div className="mt-10 p-5 bg-secondary rounded-2xl">
-        {topics?.map((topic: any, index: number) => (
-          <div>
+        {topics?.map((topic: CourseTopic, index: number) => (
+          <div key={index}>
             <h2 className="font-bold text-2xl text-primary">
               {index + 1}. {topic?.topic}
             </h2>
-            {/* <p>{topic?.content}</p> */}
             <div
               dangerouslySetInnerHTML={{ __html: topic?.content }}
               style={{ lineHeight: "2.5" }}

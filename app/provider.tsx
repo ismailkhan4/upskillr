@@ -4,19 +4,14 @@ import { SelectedChapterIndexContext } from "@/context/SelectedChapterIndexConte
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Provider({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const [userDetail, setUserDetail] = useState();
   const [selectedChapterIndex, setSelectedChapterIndex] = useState<number>(0);
 
-  useEffect(() => {
-    if (user) {
-      CreateNewUser();
-    }
-  }, [user]);
-  const CreateNewUser = async () => {
+  const CreateNewUser = useCallback(async () => {
     try {
       const result = await axios.post("/api/user", {
         name: user?.fullName,
@@ -26,7 +21,12 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error creating new user:", error);
     }
-  };
+  }, [user]);
+  useEffect(() => {
+    if (user) {
+      CreateNewUser();
+    }
+  }, [user, CreateNewUser]);
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
       <SelectedChapterIndexContext.Provider

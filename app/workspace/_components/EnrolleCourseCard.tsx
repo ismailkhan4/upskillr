@@ -1,25 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Book, LoaderCircle, PlayCircle, Settings } from "lucide-react";
+import { Course, EnrollCourse } from "@/types/types";
+import { PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
-export default function EnrollCourseCard({ course, enrollCourse }: any) {
+export default function EnrollCourseCard({
+  course,
+  enrollCourse,
+}: {
+  course: Course;
+  enrollCourse: EnrollCourse;
+}) {
   const courseJson = course?.courseJson?.course;
-  const [isLoading, setIsLoading] = useState(false);
 
   const CalculatePerProgress = () => {
     return (
-      (enrollCourse?.completedChapters?.length ??
-        0 / course?.courseContent.length) * 100
+      ((enrollCourse?.completedChapters?.length ?? 0) /
+        (course?.courseContent?.length ?? 1)) *
+      100
     );
   };
   return (
     <div className="shadow rounded-xl">
       <Image
         src={course?.bannerImageUrl}
-        alt={course?.name}
+        alt={course?.name || ""}
         width={"400"}
         height={300}
         className="w-full aspect-video rounded-t-xl object-cover"

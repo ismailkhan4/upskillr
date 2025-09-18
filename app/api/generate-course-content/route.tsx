@@ -4,6 +4,18 @@ import axios from "axios";
 import { coursesTable } from "@/config/schema";
 import { db } from "@/config/db";
 import { eq } from "drizzle-orm";
+import { Chapter, YoutubeVideo } from "@/types/types";
+
+interface YoutubeApiResponse {
+  items: {
+    id: {
+      videoId: string;
+    };
+    snippet: {
+      title: string;
+    };
+  }[];
+}
 
 const PROMPT = `Depends on Chapter name and Topic Generate content for each topic in HTML 
 
@@ -29,7 +41,7 @@ content:<>
 export async function POST(request: Request) {
   const { courseJson, courseTitle, courseId } = await request.json();
 
-  const promises = courseJson?.chapters?.map(async (chapter: any) => {
+  const promises = courseJson?.chapters?.map(async (chapter: Chapter) => {
     const config = {
       responseMimeType: "text/plain",
     };
@@ -61,9 +73,9 @@ export async function POST(request: Request) {
     };
   });
 
-  const CourseContent: any = await Promise.all(promises);
+  const CourseContent = await Promise.all(promises);
 
-  const dbResponse = await db
+  await db
     .update(coursesTable)
     .set({
       courseContent: CourseContent,
@@ -77,7 +89,7 @@ export async function POST(request: Request) {
 }
 
 const YOUTUBE_BASE_URL = "https://www.googleapis.com/youtube/v3/search";
-const GetYoutubeVideo = async (topic: string) => {
+const GetYoutubeVideo = async (topic: string): Promise<YoutubeVideo[]> => {
   const params = {
     part: "snippet",
     q: topic,
@@ -86,10 +98,12 @@ const GetYoutubeVideo = async (topic: string) => {
     key: process.env.YOUTUBE_API_KEY,
   };
 
-  const response = await axios.get(YOUTUBE_BASE_URL, { params });
+  const response = await axios.get<YoutubeApiResponse>(YOUTUBE_BASE_URL, {
+    params,
+  });
   const youtubeVideoListResp = response.data.items;
-  const youtubeVideoList: any = [];
-  youtubeVideoListResp.forEach((item: any) => {
+  const youtubeVideoList: YoutubeVideo[] = [];
+  youtubeVideoListResp.forEach((item) => {
     const data = {
       videoId: item?.id?.videoId,
       title: item?.snippet?.title,

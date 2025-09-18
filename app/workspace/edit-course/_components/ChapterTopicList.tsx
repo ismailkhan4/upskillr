@@ -1,12 +1,17 @@
+import { Chapter, Course } from "@/types/types";
 import { Gift } from "lucide-react";
 
-export default function ChapterTopicList({ course }: any) {
+interface CourseTypes {
+  course: Course;
+}
+
+export default function ChapterTopicList({ course }: CourseTypes) {
   const courseLayout = course?.courseJson?.course;
   return (
     <div>
       <h2 className="font-bold text-3xl mt-10">Chapters & Topics</h2>
       <div className="flex flex-col items-center justify-center mt-10">
-        {courseLayout?.chapters.map((chapter: any, index: number) => (
+        {courseLayout?.chapters?.map((chapter: Chapter, index: number) => (
           <div key={index} className="flex flex-col items-center">
             <div className="p-4 border shadow rounded-xl bg-primary text-white">
               <h2 className="text-center ">Chapter {index + 1}</h2>
@@ -23,7 +28,7 @@ export default function ChapterTopicList({ course }: any) {
             </div>
 
             <div>
-              {chapter?.topics.map((topic: any, index: number) => (
+              {chapter?.topics.map((topic, index: number) => (
                 <div className="flex flex-col items-center" key={index}>
                   <div className="h-10 bg-gray-300 w-1"></div>
 

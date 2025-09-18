@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Course } from "@/types/types";
 import axios from "axios";
 import { Book, Clock, PlayCircle, TrendingUp } from "lucide-react";
 import Image from "next/image";
@@ -7,7 +8,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function CourseInfo({ course, viewCourse }: any) {
+interface CourseInfoProps {
+  course: Course;
+  viewCourse?: boolean;
+}
+
+export default function CourseInfo({ course, viewCourse }: CourseInfoProps) {
   const courseLayout = course?.courseJson?.course;
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -26,7 +32,7 @@ export default function CourseInfo({ course, viewCourse }: any) {
       toast.success("Course Generated successfully");
     } catch (error) {
       setIsLoading(false);
-      toast.error("Server Side error, Try Again");
+      toast.error(`Error: ${error}`);
     }
   };
 
@@ -82,7 +88,7 @@ export default function CourseInfo({ course, viewCourse }: any) {
       </div>
       <Image
         src={course?.bannerImageUrl}
-        alt={courseLayout?.name}
+        alt={courseLayout?.name || ""}
         width={400}
         height={400}
         className="w-full mt-5 md:mt-0 h-[240px] object-cover aspect-auto rounded-2xl"

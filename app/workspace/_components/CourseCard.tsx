@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Course } from "@/types/types";
 import axios from "axios";
 import { Book, LoaderCircle, PlayCircle, Settings } from "lucide-react";
 import Image from "next/image";
@@ -6,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function CourseCard({ course }: any) {
+export default function CourseCard({ course }: { course: Course }) {
   const courseJson = course?.courseJson?.course;
   const [isLoading, setIsLoading] = useState(false);
   const onEnrollCourse = async () => {
@@ -33,7 +34,7 @@ export default function CourseCard({ course }: any) {
     <div className="shadow rounded-xl">
       <Image
         src={course?.bannerImageUrl}
-        alt={course?.name}
+        alt={course?.name || ""}
         width={"400"}
         height={300}
         className="w-full aspect-video rounded-t-xl object-cover"
@@ -48,7 +49,7 @@ export default function CourseCard({ course }: any) {
             <Book className="text-primary h-5 w-5" /> {courseJson?.noOfChapters}{" "}
             Chapters
           </h2>
-          {course?.courseContent.length ? (
+          {course?.courseContent?.length ? (
             <Button disabled={isLoading} size={"sm"} onClick={onEnrollCourse}>
               {isLoading ? (
                 <LoaderCircle className="animate-spin" />

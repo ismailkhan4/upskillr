@@ -8,6 +8,11 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams?.get("courseId");
   const user = await currentUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
+
+  if (!email) {
+    throw new Error("User email is missing");
+  }
 
   if (courseId) {
     const result = await db
@@ -20,9 +25,7 @@ export async function GET(request: Request) {
     const result = await db
       .select()
       .from(coursesTable)
-      .where(
-        eq(coursesTable?.userEmail, user?.primaryEmailAddress?.emailAddress!)
-      )
+      .where(eq(coursesTable?.userEmail, email))
       .orderBy(desc(coursesTable?.id));
 
     return NextResponse.json(result);
