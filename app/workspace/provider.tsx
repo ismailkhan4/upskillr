@@ -11,7 +11,7 @@ export default function WorkspaceProvider({
     <SidebarProvider>
       <AppSidebar />
       <div className="w-full">
-        <AppHeader />
+        <AppHeader hideSidebar={false} />
         <div className="p-10">{children}</div>
       </div>
     </SidebarProvider>

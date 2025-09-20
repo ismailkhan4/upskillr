@@ -11,14 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  Book,
-  Compass,
-  LayoutDashboard,
-  PencilRulerIcon,
-  UserCircle2Icon,
-  WalletCards,
-} from "lucide-react";
+import { Book, Compass, LayoutDashboard, UserCircle2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -33,22 +26,12 @@ const SideBarOptions = [
   {
     title: "My Learning",
     icon: Book,
-    path: "/workspace/my-courses",
+    path: "/workspace/my-learning",
   },
   {
     title: "Explore Courses",
     icon: Compass,
     path: "/workspace/explore",
-  },
-  {
-    title: "AI Tools",
-    icon: PencilRulerIcon,
-    path: "/workspace/ai-tools",
-  },
-  {
-    title: "Billing",
-    icon: WalletCards,
-    path: "/workspace/billing",
   },
   {
     title: "Profile",
