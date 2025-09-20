@@ -14,7 +14,6 @@ export default function CourseList() {
 
   const GetCourseList = useCallback(async () => {
     const result = await axios.get("/api/courses");
-    console.log("course:", result.data);
     setCourseList(result.data);
   }, []);
   useEffect(() => {

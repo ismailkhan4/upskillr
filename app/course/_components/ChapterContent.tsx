@@ -1,6 +1,6 @@
 import { SelectedChapterIndexContext } from "@/context/SelectedChapterIndexContext";
 import Youtube from "react-youtube";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2Icon, X } from "lucide-react";
 import axios from "axios";
@@ -33,18 +33,21 @@ export default function ChapterContent({
   const videoData = courseContent?.[selectedChapterIndex]?.youtubeVideo;
   const topics = courseContent?.[selectedChapterIndex]?.courseData?.topics;
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [selectedChapterIndex]);
+
   const [isLoading, setIsLoading] = useState(false);
 
-  const completedChapter = enrollCourse?.completedChapters ?? [];
+  const completedChapter = enrollCourse?.completedChapter ?? [];
 
   const markChapterCompleted = async () => {
     setIsLoading(true);
     completedChapter.push(selectedChapterIndex);
-    const result = await axios.put("/api/enroll-course", {
+    await axios.put("/api/enroll-course", {
       courseId: courseId,
       completedChapter,
     });
-    console.log(result);
     refreshData();
     setIsLoading(false);
     toast.success("Chapter Marked Completed!");
@@ -55,11 +58,10 @@ export default function ChapterContent({
     const completedChap = completedChapter.filter(
       (item: number) => item != selectedChapterIndex
     );
-    const result = await axios.put("/api/enroll-course", {
+    await axios.put("/api/enroll-course", {
       courseId: courseId,
       completedChapter: completedChap,
     });
-    console.log(result);
     refreshData();
     setIsLoading(false);
     toast.success("Chapter Marked Incompleted!");

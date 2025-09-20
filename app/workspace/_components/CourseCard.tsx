@@ -16,7 +16,6 @@ export default function CourseCard({ course }: { course: Course }) {
       const result = await axios.post("/api/enroll-course", {
         courseId: course?.cid,
       });
-      console.log("courseResult:", result.data);
       if (result.data.response) {
         toast.warning("Already Enrolled!");
         setIsLoading(false);
@@ -25,8 +24,7 @@ export default function CourseCard({ course }: { course: Course }) {
       toast.success("Enrolled");
       setIsLoading(false);
     } catch (error) {
-      toast.error("Server side error");
-      console.log("Error:", error);
+      toast.error(`Error: ${error}`);
       setIsLoading(false);
     }
   };
@@ -41,7 +39,7 @@ export default function CourseCard({ course }: { course: Course }) {
       />
       <div className="p-3 flex flex-col gap-3">
         <h2 className="font-bold text-lg">{courseJson?.name}</h2>
-        <p className="line-clamp-3 text-gray-400 text-sm">
+        <p className="line-clamp-2 text-gray-400 text-sm">
           {courseJson?.description}
         </p>
         <div className="flex justify-between items-center">

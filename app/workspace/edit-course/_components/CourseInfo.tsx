@@ -21,13 +21,12 @@ export default function CourseInfo({ course, viewCourse }: CourseInfoProps) {
   const generateCourseContent = async () => {
     setIsLoading(true);
     try {
-      const result = await axios.post("/api/generate-course-content", {
+      await axios.post("/api/generate-course-content", {
         courseJson: courseLayout,
         courseTitle: course?.name,
         courseId: course?.cid,
       });
       setIsLoading(false);
-      console.log("course content: ", result.data);
       router.replace("/workspace");
       toast.success("Course Generated successfully");
     } catch (error) {
@@ -76,11 +75,7 @@ export default function CourseInfo({ course, viewCourse }: CourseInfoProps) {
           </Button>
         ) : (
           <Link href={`/course/${course?.cid}`}>
-            <Button
-              className="max-w-lg"
-              onClick={generateCourseContent}
-              disabled={isLoading}
-            >
+            <Button className="max-w-lg mt-3">
               <PlayCircle /> Continue Learning
             </Button>
           </Link>

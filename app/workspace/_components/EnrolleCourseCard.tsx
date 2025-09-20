@@ -16,7 +16,7 @@ export default function EnrollCourseCard({
 
   const CalculatePerProgress = () => {
     return (
-      ((enrollCourse?.completedChapters?.length ?? 0) /
+      ((enrollCourse?.completedChapter?.length ?? 0) /
         (course?.courseContent?.length ?? 1)) *
       100
     );

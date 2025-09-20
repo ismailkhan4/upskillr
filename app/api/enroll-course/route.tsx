@@ -78,6 +78,8 @@ export async function PUT(request: Request) {
   const user = await currentUser();
   const email = user?.primaryEmailAddress?.emailAddress;
 
+  console.log("completedChapter:", completedChapter);
+
   if (!email) {
     throw new Error("User email is missing!");
   }

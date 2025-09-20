@@ -1,17 +1,23 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
-import Link from "next/link";
+import Header from "@/components/landing/Header";
+import Hero from "@/components/landing/Hero";
+import Features from "@/components/landing/Features";
+import ExploreCourses from "@/components/landing/ExploreCourses";
+import ProfileSecurity from "@/components/landing/ProfileSecurity";
+import Pricing from "@/components/landing/Pricing";
+import Footer from "@/components/landing/Footer";
 
-export default function Home() {
-  const { user } = useUser();
+export default function HomePage() {
   return (
-    <div>
-      Hello {user?.fullName || "User"}
-      <Button>
-        <Link href={"/workspace"}>Go to Workspace</Link>
-      </Button>
-      {/* <UserButton /> */}
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <Header />
+      <main>
+        <Hero />
+        <Features />
+        <ExploreCourses />
+        <ProfileSecurity />
+        <Pricing />
+      </main>
+      <Footer />
     </div>
   );
 }

@@ -15,7 +15,6 @@ export default function EditCourse({ viewCourse = false }) {
     setIsLoading(true);
     try {
       const result = await axios.get(`/api/courses?courseId=${courseId}`);
-      console.log("result.data", result);
       setIsLoading(false);
       setCourse(result.data);
     } catch (error) {

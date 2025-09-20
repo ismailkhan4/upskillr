@@ -27,7 +27,9 @@ export default function ChapterListSidebar({
   }
 
   const { setSelectedChapterIndex } = context;
-  const completedChapter = enrollCourse?.completedChapters ?? [];
+  const completedChapter = enrollCourse?.completedChapter ?? [];
+
+  console.log("completedChapter:", enrollCourse);
 
   return (
     <div className="w-80 bg-secondary h-screen p-5 fixed">

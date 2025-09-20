@@ -57,7 +57,7 @@ export interface EnrollCourse {
   id: number;
   cid: string;
   userEmail: string;
-  completedChapters?: number[] | null;
+  completedChapter?: any[];
 }
 export interface CourseInfo {
   courses: Course;
