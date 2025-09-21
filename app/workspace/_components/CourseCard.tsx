@@ -30,13 +30,23 @@ export default function CourseCard({ course }: { course: Course }) {
   };
   return (
     <div className="shadow rounded-xl">
-      <Image
-        src={course?.bannerImageUrl}
-        alt={course?.name || ""}
-        width={"400"}
-        height={300}
-        className="w-full aspect-video rounded-t-xl object-cover"
-      />
+      {course?.bannerImageUrl ? (
+        <Image
+          src={course.bannerImageUrl}
+          alt={course?.name || "Course Banner"}
+          width={400}
+          height={300}
+          className="w-full aspect-video rounded-t-xl object-cover"
+        />
+      ) : (
+        <Image
+          src={`https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg`}
+          alt={course?.name || ""}
+          width={"400"}
+          height={300}
+          className="w-full aspect-video rounded-t-xl object-cover"
+        />
+      )}
       <div className="p-3 flex flex-col gap-3">
         <h2 className="font-bold text-lg">{courseJson?.name}</h2>
         <p className="line-clamp-2 text-gray-400 text-sm">
