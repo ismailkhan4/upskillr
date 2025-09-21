@@ -29,6 +29,7 @@ export default function AddNewCourseDialog({
   children: React.ReactNode;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -55,16 +56,18 @@ export default function AddNewCourseDialog({
         courseId,
       });
       setIsLoading(false);
+      setIsOpen(false);
       route.push(`/workspace/edit-course/${result?.data?.courseId}`);
     } catch (error) {
       console.error("Error generating course layout:", error);
     } finally {
       setIsLoading(false);
+      setIsOpen(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>

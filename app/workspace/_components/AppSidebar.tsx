@@ -63,7 +63,7 @@ export function AppSidebar() {
                     <Link
                       href={item.path}
                       className={`text-[17px] ${
-                        path.includes(item.path) && "text-primary bg-purple-50"
+                        path === item.path ? "text-primary bg-purple-50" : ""
                       }`}
                     >
                       <item.icon className="h-7 w-7" />
